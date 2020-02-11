@@ -70,7 +70,7 @@ public class ExcelRenderTest {
         EasyExcel.write(excelFileFill).withTemplate(excelFileTmp).sheet().doFill(map);
         //加载Excel工作表
         Workbook wb = new Workbook();
-        wb.loadFromFile("doc" + File.separator + "test2.xlsx");
+        wb.loadFromFile(excelFileFill);
         //获取工作表
         WorksheetsCollection sheets = wb.getWorksheets();
         Worksheet worksheet;

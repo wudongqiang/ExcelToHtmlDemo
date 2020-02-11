@@ -22,5 +22,7 @@ public class ExcelToImg {
         //调用方法，将指定Excel单元格数据范围保存为图片
         //sheet.saveToImage("ToImg2.png",8,1,30,7);
 
+        // to pdf
+        sheet.saveToPdf("test.pdf");
     }
 }

@@ -1,4 +1,4 @@
-package com.excel.html;
+package com.excel;
 
 
 import com.spire.xls.FileFormat;
@@ -8,11 +8,13 @@ import com.spire.xls.Worksheet;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-public class ExcelToImg {
+public class ExcelConvertDemo {
+
+
     public static void main(String[] args) throws Exception {
         //加载Excel工作表 https://www.e-iceblue.cn
         Workbook wb = new Workbook();
-        wb.loadFromFile("c:\\mdata\\work\\ExcelToHtmlDemo\\doc\\test.xlsx");
+        wb.loadFromFile("c:\\mdata\\work\\ExcelToHtmlDemo\\doc\\test2.xlsx");
 
         //获取工作表
         Worksheet sheet = wb.getWorksheets().get(0);

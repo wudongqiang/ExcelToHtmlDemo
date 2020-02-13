@@ -24,10 +24,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <poi.version>4.1.1</poi.version>
     </properties>
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -45,25 +57,35 @@
             <artifactId>lombok</artifactId>
             <version>1.18.10</version>
         </dependency>
-       <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>easyexcel</artifactId>
-            <version>2.1.6</version>
-        </dependency>
-       <!--
-          <repositories>
-        <repository>
-            <id>com.e-iceblue</id>
-            <name>e-iceblue</name>
-            <url>http://repo.e-iceblue.com/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
 
-       <dependency>
-            <groupId>e-iceblue</groupId>
-            <artifactId>spire.xls.free</artifactId>
-            <version>2.2.0</version>
-        </dependency>-->
+
+        <!--
+           <repositories>
+         <repository>
+             <id>com.e-iceblue</id>
+             <name>e-iceblue</name>
+             <url>http://repo.e-iceblue.com/nexus/content/groups/public/</url>
+         </repository>
+     </repositories>
+
+        <dependency>
+             <groupId>e-iceblue</groupId>
+             <artifactId>spire.xls.free</artifactId>
+             <version>2.2.0</version>
+         </dependency>-->
+
+        <!--
+        <repository>
+            <id>AsposeJavaAPI</id>
+            <name>Aspose Java API</name>
+            <url>https://repository.aspose.com/repo/</url>
+        </repository>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-cells</artifactId>
+            <version>20.1</version>
+        </dependency>
+        -->
     </dependencies>
 
 </project>

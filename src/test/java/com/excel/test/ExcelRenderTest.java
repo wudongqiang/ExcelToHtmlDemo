@@ -1,10 +1,7 @@
 package com.excel.test;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.write.metadata.WriteSheet;
-import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.excel.FillDataToExcel;
+import com.excel.aspose.AsposeExcelToHtmlDemo;
 import com.spire.xls.Workbook;
 import com.spire.xls.Worksheet;
 import com.spire.xls.collections.WorksheetsCollection;
@@ -66,33 +63,20 @@ public class ExcelRenderTest {
         map.put("b1", 1);
         map.put("c1", 2.4);
         map.put("d1", 1);
+
+        map.put("s18a", 1);
+        map.put("s18b", 1);
+        map.put("s18c", 1.4);
+        map.put("s18d", 1);
+
+        map.put("s19a", 1);
+        map.put("s19b", 1);
+        map.put("s19c", 2.4);
+        map.put("s19d", 1);
     }
 
-    // 模板注意 用{} 来表示你要用的变量 如果本来就有"{","}" 特殊字符 用"\{","\}"代替
     String excelFileTmp = "doc" + File.separator + "test3.xlsx";
     String path = "doc" + File.separator + "convert" + File.separator;
-
-
-    @Test
-    public void testExcelConvert1() throws Exception {
-        //填充值
-        //方式1
-        File excelFileFill = FillDataToExcel.createNewFile(excelFileTmp);
-        Map<String, Boolean> workbookFillSheet = FillDataToExcel.getWorkbookFillSheet(excelFileFill);
-        ExcelWriter excelWriter =   EasyExcel.write(excelFileFill).withTemplate(excelFileTmp).build();
-        FillConfig build = FillConfig.builder().forceNewRow(Boolean.FALSE).build();
-        workbookFillSheet.forEach((k,v)->{
-            System.out.println("=="+k);
-//            EasyExcel.write(excelFileFill).withTemplate(excelFileTmp).sheet(k).doFill(map);
-            excelWriter.fill(map,build, EasyExcel.writerSheet(k).build());
-        });
-
-        //表达式处理
-       // FillDataToExcel.handlerEvaluatorExcel(excelFileFill);
-
-        //htmlToDoc(path, excelFileFill);
-
-    }
 
     static Map<String, Object> data = new HashMap<>();
 
@@ -142,14 +126,28 @@ public class ExcelRenderTest {
     }
 
     /**
-     * //方式2 填充+表达式计算
+     * 方式1 spire 转html
+     * 占位符方式
      *
      * @throws Exception
      */
     @Test
-    public void testExcelConvert2() throws Exception {
+    public void testExcelConvert1() throws Exception {
+        //填充+表达式计算
         File excelFile = FillDataToExcel.writeExcel(excelFileTmp, data);
-      //  htmlToDoc(path, excelFile);
+        htmlToDoc(path, excelFile);
+    }
+
+    /**
+     * 方式2 Aspose 转html
+     * 定义名称方式
+     * @throws Exception
+     */
+    @Test
+    public void testExcelConvert2() throws Exception {
+        File excelFile = FillDataToExcel.fillExcel(excelFileTmp, map);
+        //包含表达式计算
+        AsposeExcelToHtmlDemo.excelToHtml(excelFile,path+"\\result.html");
     }
 
     /**
@@ -181,13 +179,3 @@ public class ExcelRenderTest {
     }
 
 }
-
-
-
-/*
-1. Excel转HTML时，Excel中包含图形时不能转换到HTML
-2. Excel转PDF时，单一内容包含过宽会截断到下一页PDF中
-3. 使用的第三方免费版工具spire，对于低版本Excel只支持5个sheet，每个sheet最多两百行
-4. 定义Excel模板内容时使用单元格自定义名称填充方式时，poi不能读取到定义的名称，目前是使用的easyexcel中填充功能，占位符为：｛key｝
-5. Excel模板不能直接用表达式去计算占位符待填充的值（填充后的值表达式计算不到）
- */

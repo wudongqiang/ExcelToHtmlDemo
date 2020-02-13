@@ -3,7 +3,10 @@ package com.excel;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.AreaReference;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
@@ -63,15 +66,69 @@ public class FillDataToExcel {
         writeExcel("doc" + File.separator + "test3.xlsx", map);
     }
 
+    /**
+     * 使用定义名称填充值
+     * @param tmpExcelPath
+     * @param data
+     * @return
+     */
+    public static File fillExcel(String tmpExcelPath, Map<String, Object> data)  {
+        Workbook workbook = FillDataToExcel.getWorkbook(new File(tmpExcelPath));
+        List<? extends Name> allNames = workbook.getAllNames();
+        SpreadsheetVersion spreadsheetVersion = workbook instanceof HSSFWorkbook ? SpreadsheetVersion.EXCEL97 : SpreadsheetVersion.EXCEL2007;
+        String keyName;
+        AreaReference aref;
+        CellReference[] crefs;
+        Sheet sheet;
+        Row row;
+        Cell cell;
+        for (Name name : allNames) {
+            keyName = name.getNameName();
+            System.out.println("待填充的key=" + keyName);
+            if (!data.containsKey(keyName)) {
+                continue;
+            }
+            aref = new AreaReference(name.getRefersToFormula(), spreadsheetVersion);
+            crefs = aref.getAllReferencedCells();
+            for (CellReference cref : crefs) {
+                System.out.println("---" + cref.getSheetName());
+                sheet = workbook.getSheet(cref.getSheetName());
+                row = sheet.getRow(cref.getRow());
+                if (row != null) {
+                    cell = row.getCell(cref.getCol());
+                    if (cell != null) {
+                        setCellValue(cell, data.get(keyName));
+                    }
+                }
+            }
+        }
+
+        File excelFile = createNewFile(tmpExcelPath);
+        //插入数据结束
+        try (OutputStream out = new FileOutputStream(excelFile)) {
+            workbook.write(out);
+            out.flush();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return excelFile;
+    }
+
+
     public static File writeExcel(String tmpExcelPath, Map<String, Object> data) {
+        if (MapUtils.isEmpty(data)) {
+            //不填充
+            return new File(tmpExcelPath);
+        }
         // 读取Excel文档
         File excelFile = createNewFile(tmpExcelPath);
-        Workbook workBook;
-        try {
-            workBook = getWorkbook(excelFile);
-        } catch (IOException e1) {
-            throw new RuntimeException("excel文件格式错误");
-        }
+        Workbook  workBook = getWorkbook(excelFile);
         FormulaEvaluator evaluator = workBook.getCreationHelper().createFormulaEvaluator();
         //数据值填充
         for (int i = 0, len = workBook.getNumberOfSheets(); i < len; i++) {
@@ -104,12 +161,7 @@ public class FillDataToExcel {
      */
     public static void handlerEvaluatorExcel(File excelFile) {
         // 读取Excel文档
-        Workbook workBook;
-        try {
-            workBook = getWorkbook(excelFile);
-        } catch (IOException e1) {
-            throw new RuntimeException("excel文件格式错误");
-        }
+        Workbook workBook = getWorkbook(excelFile);
         FormulaEvaluator evaluator = workBook.getCreationHelper().createFormulaEvaluator();
         //执行表达式
         for (int i = 0, len = workBook.getNumberOfSheets(); i < len; i++) {
@@ -213,15 +265,19 @@ public class FillDataToExcel {
      * @return
      * @throws IOException
      */
-    public static Workbook getWorkbook(File file) throws IOException {
+    public static Workbook getWorkbook(File file)  {
         Workbook wb = null;
-        FileInputStream in = new FileInputStream(file);
-        if (file.getName().endsWith(".xls")) { // Excel&nbsp;2003
-            wb = new HSSFWorkbook(in);
-        } else if (file.getName().endsWith("xlsx")) { // Excel 2007/2010
-            wb = new XSSFWorkbook(in);
+        try {
+            FileInputStream in = new FileInputStream(file);
+            if (file.getName().endsWith(".xls")) { // Excel&nbsp;2003
+                wb = new HSSFWorkbook(in);
+            } else if (file.getName().endsWith("xlsx")) { // Excel 2007/2010
+                wb = new XSSFWorkbook(in);
+            }
+            return wb;
+        } catch (IOException e1) {
+            throw new RuntimeException("excel文件格式错误");
         }
-        return wb;
     }
 
     /**

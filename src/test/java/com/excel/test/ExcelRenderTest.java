@@ -147,7 +147,7 @@ public class ExcelRenderTest {
     public void testExcelConvert2() throws Exception {
         File excelFile = FillDataToExcel.fillExcel(excelFileTmp, map);
         //包含表达式计算
-        AsposeExcelToHtmlDemo.excelToHtml(excelFile,path+"\\result.html");
+        AsposeExcelToHtmlDemo.excelToHtml(excelFile,path+File.separator+"result.html");
     }
 
     /**

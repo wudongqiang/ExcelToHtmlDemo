@@ -1,31 +1,29 @@
 package com.excel.aspose;
 
-import com.aspose.cells.Encoding;
-import com.aspose.cells.HtmlSaveOptions;
-import com.aspose.cells.SaveFormat;
-import com.aspose.cells.Workbook;
+import com.aspose.cells.*;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 
 /**
  * 文档转换通用类  https://downloads.aspose.com/cells/java
  */
 public class AsposeExcelToHtmlDemo {
 
-//    public  boolean getLicense() {
-//        boolean result = false;
-//        try {
-//            InputStream is = FileChangeUtils.class.getClassLoader().getResourceAsStream("license.xml");
-//            License aposeLic = new License();
-//            aposeLic.setLicense(is);
-//            result = true;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return result;
-//    }
+    public static boolean getLicense() {
+        boolean result = false;
+        try {
+            InputStream is = AsposeExcelToHtmlDemo.class.getClassLoader().getResourceAsStream("license.xml");
+            License aposeLic = new License();
+            aposeLic.setLicense(is);
+            result = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     /**
      * @param excelPath excel file path
@@ -71,6 +69,10 @@ public class AsposeExcelToHtmlDemo {
 
 
     public static void excelToHtml(File sourceFilePath, String htmlFilePath) throws Exception {
+        // 验证License
+        if (!getLicense()) {
+            return;
+        }
         // Load the sample Excel file containing single sheet only
         Workbook wb = new Workbook(new FileInputStream(sourceFilePath));
         //计算表达式
@@ -95,6 +97,6 @@ public class AsposeExcelToHtmlDemo {
     public static void main(String[] args) throws Exception {
 //        excel2pdf("doc\\dddd.html","doc\\test1.xlsx");
 //        excelConvertToHtml("doc\\test1.xlsx","doc\\dddd.html");
-        //excelToHtml("doc\\test2.xlsx", "doc\\dddd2.html");
+        excelToHtml(new File("doc\\test2.xlsx"), "doc\\dddd2.html");
     }
 }

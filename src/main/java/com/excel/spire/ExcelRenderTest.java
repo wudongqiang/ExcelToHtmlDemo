@@ -148,6 +148,8 @@ public class ExcelRenderTest {
             worksheet.saveToPdf(path + worksheet.getName() + File.separator + worksheet.getName() + ".pdf");
             // 生成 image
             worksheet.saveToImage(path + worksheet.getName() + File.separator + worksheet.getName() + ".png");
+
+            worksheet.getPrstGeomShapes().get(0).getFill().getPicture();
         }
 
         //清空临时文件

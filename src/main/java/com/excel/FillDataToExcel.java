@@ -1,5 +1,6 @@
 package com.excel;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -68,11 +69,12 @@ public class FillDataToExcel {
 
     /**
      * 使用定义名称填充值
+     *
      * @param tmpExcelPath
      * @param data
      * @return
      */
-    public static File fillExcel(String tmpExcelPath, Map<String, Object> data)  {
+    public static File fillExcel(String tmpExcelPath, Map<String, Object> data) {
         Workbook workbook = FillDataToExcel.getWorkbook(new File(tmpExcelPath));
         List<? extends Name> allNames = workbook.getAllNames();
         SpreadsheetVersion spreadsheetVersion = workbook instanceof HSSFWorkbook ? SpreadsheetVersion.EXCEL97 : SpreadsheetVersion.EXCEL2007;
@@ -94,11 +96,18 @@ public class FillDataToExcel {
                 System.out.println("---" + cref.getSheetName());
                 sheet = workbook.getSheet(cref.getSheetName());
                 row = sheet.getRow(cref.getRow());
-                if (row != null) {
-                    cell = row.getCell(cref.getCol());
-                    if (cell != null) {
-                        setCellValue(cell, data.get(keyName));
-                    }
+                if (row == null) {
+                    row = sheet.createRow(cref.getRow());
+                }
+                cell = row.getCell(cref.getCol());
+                if (cell == null) {
+                    cell = row.createCell(cref.getCol());
+                }
+                Object value = data.get(keyName);
+                if (value instanceof List) {
+                    addRowCell((List) value, sheet, row, cell);
+                } else {
+                    setCellValue(cell, value);
                 }
             }
         }
@@ -120,6 +129,35 @@ public class FillDataToExcel {
         return excelFile;
     }
 
+    private static void addRowCell(List rowList, Sheet sheet, Row row, Cell cell) {
+        if (CollectionUtils.isEmpty(rowList)) {
+            return;
+        }
+        //增加行列
+        for (int i = 0, len = rowList.size(); i < len; i++) {
+            Row nRow = sheet.getRow(row.getRowNum() + i);
+            if (nRow == null) {
+                nRow = sheet.createRow(row.getRowNum() + i);
+            }
+            Object rowData = rowList.get(i);
+            if (rowData instanceof List) {
+                List cellList = (List) rowData;
+                for (int j = 0, size = cellList.size(); j < size; j++) {
+                    addCell(cell.getColumnIndex() + j, nRow, cellList.get(j));
+                }
+            } else {
+                addCell(cell.getColumnIndex(), nRow, rowData);
+            }
+        }
+    }
+
+    private static void addCell(int index, Row row, Object value) {
+        Cell nCell = row.getCell(index);
+        if (nCell == null) {
+            nCell = row.createCell(index);
+        }
+        setCellValue(nCell, value);
+    }
 
     public static File writeExcel(String tmpExcelPath, Map<String, Object> data) {
         if (MapUtils.isEmpty(data)) {
@@ -128,7 +166,7 @@ public class FillDataToExcel {
         }
         // 读取Excel文档
         File excelFile = createNewFile(tmpExcelPath);
-        Workbook  workBook = getWorkbook(excelFile);
+        Workbook workBook = getWorkbook(excelFile);
         FormulaEvaluator evaluator = workBook.getCreationHelper().createFormulaEvaluator();
         //数据值填充
         for (int i = 0, len = workBook.getNumberOfSheets(); i < len; i++) {
@@ -265,7 +303,7 @@ public class FillDataToExcel {
      * @return
      * @throws IOException
      */
-    public static Workbook getWorkbook(File file)  {
+    public static Workbook getWorkbook(File file) {
         Workbook wb = null;
         try {
             FileInputStream in = new FileInputStream(file);

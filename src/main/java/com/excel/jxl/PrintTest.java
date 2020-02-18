@@ -17,7 +17,6 @@ public class PrintTest {
 
         XSSFAnchor anchor = shape.getAnchor();
 
-
         BufferedImage image = createImage( anchor.getDx1()+ anchor.getDy1(),
                 anchor.getDx2()+ anchor.getDy2());
         Graphics2D g = (Graphics2D) image.getGraphics(); //获取画笔
@@ -27,9 +26,9 @@ public class PrintTest {
 //        g.setColor(randomColor());         //设置颜色，随机
 
 
-
         //图形的类型为线
         shape.getShapeType();
+
 
         //填充颜色
         CTShapeProperties props = shape.getCTShape().getSpPr();

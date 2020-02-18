@@ -1,9 +1,14 @@
 package com.excel.spire;
 
+import com.aspose.cells.HtmlSaveOptions;
 import com.excel.FillDataToExcel;
+import com.spire.ms.System.Collections.IEnumerator;
 import com.spire.xls.Workbook;
 import com.spire.xls.Worksheet;
 import com.spire.xls.collections.WorksheetsCollection;
+import com.spire.xls.core.IPrstGeomShape;
+import com.spire.xls.core.spreadsheet.HTMLOptions;
+import com.spire.xls.core.spreadsheet.collections.PrstGeomShapeCollection;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -122,8 +127,8 @@ public class ExcelRenderTest {
      */
     @Test
     public void testExcelConvert2() throws Exception {
-        File excelFile = FillDataToExcel.writeExcel(excelFileTmp, data);
-      //  htmlToDoc(path, excelFile);
+        //File excelFile = FillDataToExcel.writeExcel(excelFileTmp, data);
+        htmlToDoc(path, new File(excelFileTmp));
     }
 
     /**
@@ -135,21 +140,22 @@ public class ExcelRenderTest {
         //加载Excel工作表
         Workbook wb = new Workbook();
         wb.loadFromStream(new FileInputStream(excelFileFill));
+        //计算表达式
+        //wb.calculateAllValue();
+
         //获取工作表
         WorksheetsCollection sheets = wb.getWorksheets();
         Worksheet worksheet;
         //清空目录
-        FileUtils.deleteDirectory(new File(path));
+        //FileUtils.deleteDirectory(new File(path));
         for (int i = 0, len = sheets.size(); i < len; i++) {
             worksheet = sheets.get(i);
+            HTMLOptions options = new HTMLOptions();
+            options.setImageEmbedded(true);
+            options.setStyleDefine(HTMLOptions.StyleDefineType.Head);
             // 生成 html
-            worksheet.saveToHtml(path + worksheet.getName() + File.separator + worksheet.getName() + ".html");
-            // 生成 pdf
-            worksheet.saveToPdf(path + worksheet.getName() + File.separator + worksheet.getName() + ".pdf");
-            // 生成 image
-            worksheet.saveToImage(path + worksheet.getName() + File.separator + worksheet.getName() + ".png");
-
-            worksheet.getPrstGeomShapes().get(0).getFill().getPicture();
+            worksheet.saveToHtml(path + worksheet.getName() + File.separator + worksheet.getName() + ".html",
+                    options);
         }
 
         //清空临时文件
@@ -157,13 +163,3 @@ public class ExcelRenderTest {
     }
 
 }
-
-
-
-/*
-1. Excel转HTML时，Excel中包含图形时不能转换到HTML
-2. Excel转PDF时，单一内容包含过宽会截断到下一页PDF中
-3. 使用的第三方免费版工具spire，对于低版本Excel只支持5个sheet，每个sheet最多两百行
-4. 定义Excel模板内容时使用单元格自定义名称填充方式时，poi不能读取到定义的名称，目前是使用的easyexcel中填充功能，占位符为：｛key｝
-5. Excel模板不能直接用表达式去计算占位符待填充的值（填充后的值表达式计算不到）
- */

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="kkFileView-2.2.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/kkFileView-2.2.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/kkFileView-2.2.0-SNAPSHOT.jar!/" />
+    </SOURCES>
+  </library>
+</component>

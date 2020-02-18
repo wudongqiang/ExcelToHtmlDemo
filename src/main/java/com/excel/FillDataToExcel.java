@@ -1,8 +1,11 @@
 package com.excel;
 
+import com.excel.aspose.AsposeExcelToHtmlDemo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.*;
@@ -11,6 +14,8 @@ import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class FillDataToExcel {
@@ -18,53 +23,52 @@ public class FillDataToExcel {
     static Map<String, Object> map = new HashMap<>();
 
     static {
-        map.put("{bgbh}", "test1");
-        map.put("{bgsj}", "test1");
-        map.put("{qymc}", "test1");
-
-        map.put("{zczb}", "test1");
-        map.put("{zcsj}", "test1");
-        map.put("{fddbrsfzh}", "test1");
-        map.put("{fddbr}", "test1");
-        map.put("{zcdz}", "test1");
-        map.put("{fddbrsfzh}", "test1");
-        map.put("{fxpj}", "test1");
-        map.put("{mxjy}", "test1");
-        map.put("{jyje}", "test1");
-        map.put("{jyll}", "test1");
-        map.put("{szqy}", "test1");
-        map.put("{jyzt}", "test1");
-        map.put("{sshy}", "test1");
-        map.put("{qyswpj}", "test1");
-        map.put("{frnl}", "test1");
-        map.put("{frcgbl}", "test1");
-        map.put("{frzjbgrq}", "test1");
-        map.put("{qysfss}", "test1");
-
-        map.put("{j24gykpdys}", 1);
-        map.put("{j24gyzszkpdyf}", 2);
-        map.put("{j12gylxkpw0dys}", "test1");
-        map.put("{j12gyzkpdyw0dys}", "test1");
-        map.put("{j2412gyzlxkpw0dys}", "test1");
-        map.put("{j12gyzkpdyw0dsy}", "test1");
-        map.put("{j6gyzkpdyw0dys}", "test1");
-        map.put("{j2gyzkpdyw0dys}", "test1");
-        map.put("{j12gyzkpzje}", "test1");
-
-        map.put("{a}", 1);
-        map.put("{b}", 1);
-        map.put("{c}", 1.4);
-        map.put("{d}", 1);
-
-        map.put("{a1}", 1);
-        map.put("{b1}", 1);
-        map.put("{c1}", 2.4);
-        map.put("{d1}", 1);
+        map.put("bgbh","SC20191010D1234567N");
+        map.put("bgsj","2019/10/10 10:34:40");
+        map.put("qymc","重庆xxx科技有限公司");
+        map.put("zczb",5000000);
+        map.put("zcsj","2005-10-18");
+        map.put("zcdz","重庆市江北区建新西路76号");
+        map.put("frdb","王x明");
+        map.put("frsfz","110223XXXXXXXX2093");
+        map.put("frdbcgbl",0.9);
+        map.put("sshy","软件和信息技术服务业");
+        map.put("fxpj","A");
+        map.put("mxjy","自动通过");
+        map.put("jyed","30万");
+        map.put("jyll","10%");
+        map.put("szqy","重庆.江北区");
+        map.put("jyzt","存续（在营、开业、在册）");
+        map.put("yydj","B");
+        map.put("clrq","2012-04-25");
+        map.put("jysshy","建筑业");
+        map.put("frnl",47);
+        map.put("jyfrcgbl",0.3);
+        map.put("frzjbgrq","2012-04-25");
+        map.put("j24gykpys",18);
+        map.put("j24gyszkpyf","2017-06");
+        map.put("j12gyzkplxys",0);
+        map.put("j12z24gyzkp0ys",0);
+        map.put("j12gykpdyw0ys",1);
+        map.put("j6gykpdyw0ys",2);
+        map.put("j2gykpdyw0ys",0);
+        map.put("j12gyndje","50万");
+        map.put("j12y17nje",121462.12);
+        map.put("j12y18n9yje",243461.12);
+        map.put("j12y18n1yje",236342.12);
+        map.put("j12y18n11yje",472312.12);
+        map.put("j12yfp1801je",172423.11);
+        map.put("j12yfp1802je",12466.42);
+        map.put("j12yfp1803je",1242.4);
+        map.put("j12yfp1902je",1242.2);
+        map.put("j12yfp1904je",14524.12);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         //writeExcel("doc" + File.separator + "test1.xlsx");
-        writeExcel("doc" + File.separator + "test3.xlsx", map);
+        File excelFile = fillExcel("doc" + File.separator + "Excel引擎范例-20200218.xlsx", map);
+        //包含表达式计算
+        AsposeExcelToHtmlDemo.excelToHtml(excelFile, "doc" + File.separator + "result.html");
     }
 
     /**
@@ -86,15 +90,23 @@ public class FillDataToExcel {
         Cell cell;
         for (Name name : allNames) {
             keyName = name.getNameName();
-            System.out.println("待填充的key=" + keyName);
+           // System.out.println("待填充的key=" + keyName);
             if (!data.containsKey(keyName)) {
                 continue;
             }
-            aref = new AreaReference(name.getRefersToFormula(), spreadsheetVersion);
+           try{
+               aref = new AreaReference(name.getRefersToFormula(), spreadsheetVersion);
+           }catch (Exception e){
+               System.out.println("定义名称区域错误");
+               continue;
+           }
             crefs = aref.getAllReferencedCells();
             for (CellReference cref : crefs) {
-                System.out.println("---" + cref.getSheetName());
+                //System.out.println("---" + cref.getSheetName());
                 sheet = workbook.getSheet(cref.getSheetName());
+                if(sheet==null){
+                    continue;
+                }
                 row = sheet.getRow(cref.getRow());
                 if (row == null) {
                     row = sheet.createRow(cref.getRow());
@@ -103,6 +115,7 @@ public class FillDataToExcel {
                 if (cell == null) {
                     cell = row.createCell(cref.getCol());
                 }
+               // System.out.println(keyName+"=="+getCellValue(cell,evaluator));
                 Object value = data.get(keyName);
                 if (value instanceof List) {
                     addRowCell((List) value, sheet, row, cell);
@@ -150,6 +163,68 @@ public class FillDataToExcel {
             }
         }
     }
+
+
+    /**
+     * 获取表格单元格Cell内容
+     *
+     * @param cell
+     * @return
+     */
+    private static String getCellValue(Cell cell, FormulaEvaluator evaluator) {
+        String result = new String();
+        switch (cell.getCellType()) {
+            case NUMERIC:// 数字类型
+                if (HSSFDateUtil.isCellDateFormatted(cell)) {// 处理日期格式、时间格式
+                    SimpleDateFormat sdf = null;
+                    if (cell.getCellStyle().getDataFormat() == HSSFDataFormat.getBuiltinFormat("h:mm")) {
+                        sdf = new SimpleDateFormat("HH:mm");
+                    } else {// 日期
+                        sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    }
+                    Date date = cell.getDateCellValue();
+                    result = sdf.format(date);
+                } else if (cell.getCellStyle().getDataFormat() == 58) {
+                    // 处理自定义日期格式：m月d日(通过判断单元格的格式id解决，id的值是58)
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    double value = cell.getNumericCellValue();
+                    Date date = org.apache.poi.ss.usermodel.DateUtil.getJavaDate(value);
+                    result = sdf.format(date);
+                } else {
+                    double value = cell.getNumericCellValue();
+                    CellStyle style = cell.getCellStyle();
+                    DecimalFormat format = new DecimalFormat();
+                    String temp = style.getDataFormatString();
+                    // 单元格设置成常规
+                    if (temp.equals("General")) {
+                        format.applyPattern("#");
+                    }
+                    result = format.format(value);
+                }
+                break;
+            case STRING:// String类型
+                result = cell.getRichStringCellValue().toString();
+                break;
+            case BLANK:
+                break;
+            case FORMULA:
+                result = cell.getCellFormula();
+                CellValue cellValue = evaluator.evaluate(cell);
+                if (CellType.BOOLEAN.equals(cellValue.getCellType())) {
+                    result = cellValue.getBooleanValue()+"";
+                } else if (CellType.NUMERIC.equals(cellValue.getCellType())) {
+                    result = cellValue.getNumberValue()+"";
+                } else if (CellType.STRING.equals(cellValue.getCellType())) {
+                    result =cellValue.getStringValue();
+                }
+                break;
+            default:
+                result = "";
+                break;
+        }
+        return result;
+    }
+
 
     private static void addCell(int index, Row row, Object value) {
         Cell nCell = row.getCell(index);
@@ -234,13 +309,13 @@ public class FillDataToExcel {
                 if (cell == null) {
                     continue;
                 }
-                if (CellType.FORMULA.equals(cell.getCellTypeEnum())) {
+                if (CellType.FORMULA.equals(cell.getCellType())) {
                     CellValue cellValue = evaluator.evaluate(cell);
-                    if (CellType.BOOLEAN.equals(cellValue.getCellTypeEnum())) {
+                    if (CellType.BOOLEAN.equals(cellValue.getCellType())) {
                         cell.setCellValue(cellValue.getBooleanValue());
-                    } else if (CellType.NUMERIC.equals(cellValue.getCellTypeEnum())) {
+                    } else if (CellType.NUMERIC.equals(cellValue.getCellType())) {
                         cell.setCellValue(cellValue.getNumberValue());
-                    } else if (CellType.STRING.equals(cellValue.getCellTypeEnum())) {
+                    } else if (CellType.STRING.equals(cellValue.getCellType())) {
                         cell.setCellValue(cellValue.getStringValue());
                     }
                 }

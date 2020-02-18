@@ -2,15 +2,20 @@ package com.excel.test;
 
 import com.excel.FillDataToExcel;
 import com.excel.aspose.AsposeExcelToHtmlDemo;
+import com.excel.customer.ExcelToHtml;
 import com.spire.xls.Workbook;
 import com.spire.xls.Worksheet;
 import com.spire.xls.collections.WorksheetsCollection;
+import com.spire.xls.core.spreadsheet.HTMLOptions;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ExcelRenderTest
@@ -44,9 +49,9 @@ public class ExcelRenderTest {
         map.put("frzjbgrq", 11);
         map.put("qysfss", 11);
 
-        map.put("j24gykpdys", 1);
-        map.put("j24gyzszkpdyf", 2);
-        map.put("j12gylxkpw0dys", 11);
+//        map.put("j24gykpdys", 1);
+//        map.put("j24gyzszkpdyf", 2);
+//        map.put("j12gylxkpw0dys", 11);
         map.put("j12gyzkpdyw0dys", 11);
         map.put("j2412gyzlxkpw0dys", 11);
         map.put("j12gyzkpdyw0dsy", 11);
@@ -79,7 +84,7 @@ public class ExcelRenderTest {
         list.add("1");
         list.add("1");
         list.add("1");
-        map.put("listTest",list);
+        map.put("listTest", list);
 
         //list[]
         List<List<Object>> listData = new ArrayList<>();
@@ -93,58 +98,19 @@ public class ExcelRenderTest {
         list2.add(22);
         listData.add(list1);
         listData.add(list2);
-        map.put("listList",listData);
+        map.put("listList", listData);
 
     }
 
     String excelFileTmp = "doc" + File.separator + "test1.xlsx";
     String path = "doc" + File.separator + "convert" + File.separator;
 
-    static Map<String, Object> data = new HashMap<>();
-
-    static {
-        data.put("{bgbh}", "test1");
-        data.put("{bgsj}", "test1");
-        data.put("{qymc}", "test1");
-
-        data.put("{zczb}", "test1");
-        data.put("{zcsj}", "test1");
-        data.put("{fddbrsfzh}", "test1");
-        data.put("{fddbr}", "test1");
-        data.put("{zcdz}", "test1");
-        data.put("{fddbrsfzh}", "test1");
-        data.put("{fxpj}", "test1");
-        data.put("{mxjy}", "test1");
-        data.put("{jyje}", "test1");
-        data.put("{jyll}", "test1");
-        data.put("{szqy}", "test1");
-        data.put("{jyzt}", "test1");
-        data.put("{sshy}", "test1");
-        data.put("{qyswpj}", "test1");
-        data.put("{frnl}", "test1");
-        data.put("{frcgbl}", "test1");
-        data.put("{frzjbgrq}", "test1");
-        data.put("{qysfss}", "test1");
-
-        data.put("{j24gykpdys}", 1);
-        data.put("{j24gyzszkpdyf}", 2);
-        data.put("{j12gylxkpw0dys}", "test1");
-        data.put("{j12gyzkpdyw0dys}", "test1");
-        data.put("{j2412gyzlxkpw0dys}", "test1");
-        data.put("{j12gyzkpdyw0dsy}", "test1");
-        data.put("{j6gyzkpdyw0dys}", "test1");
-        data.put("{j2gyzkpdyw0dys}", "test1");
-        data.put("{j12gyzkpzje}", "test1");
-
-        data.put("{a}", 1);
-        data.put("{b}", 1);
-        data.put("{c}", 1.4);
-        data.put("{d}", 1);
-
-        data.put("{a1}", 1);
-        data.put("{b1}", 1);
-        data.put("{c1}", 2.4);
-        data.put("{d1}", 1);
+    @Test
+    public void testCustomer1() {
+        //填充
+        File excelFile = FillDataToExcel.fillExcel(excelFileTmp, map);
+        //转html
+        ExcelToHtml.excelToHtml(excelFile.getAbsolutePath(), "C:\\mdata\\work\\ExcelToHtmlDemo\\doc\\result1.html");
     }
 
     /**
@@ -157,9 +123,9 @@ public class ExcelRenderTest {
      * @throws Exception
      */
     @Test
-    public void testExcelConvert1() throws Exception {
-        //填充+表达式计算
-        File excelFile = FillDataToExcel.writeExcel(excelFileTmp, data);
+    public void testExcelConvert2() throws Exception {
+        //填充
+        File excelFile = FillDataToExcel.fillExcel(excelFileTmp, map);
         htmlToDoc(path, excelFile);
     }
 
@@ -172,11 +138,11 @@ public class ExcelRenderTest {
      * @throws Exception
      */
     @Test
-    public void testExcelConvert2() throws Exception {
+    public void testExcelConvert3() throws Exception {
         //定义名称方式
         File excelFile = FillDataToExcel.fillExcel(excelFileTmp, map);
         //包含表达式计算
-        //AsposeExcelToHtmlDemo.excelToHtml(excelFile,path+File.separator+"result.html");
+        AsposeExcelToHtmlDemo.excelToHtml(excelFile, path + File.separator + "result3.html");
     }
 
     /**
@@ -188,19 +154,22 @@ public class ExcelRenderTest {
         //加载Excel工作表
         Workbook wb = new Workbook();
         wb.loadFromStream(new FileInputStream(excelFileFill));
+        wb.calculateAllValue();
         //获取工作表
         WorksheetsCollection sheets = wb.getWorksheets();
         Worksheet worksheet;
         //清空目录
-        FileUtils.deleteDirectory(new File(path));
+        //FileUtils.deleteDirectory(new File(path));
+
+        HTMLOptions htmlOptions = new HTMLOptions();
+        htmlOptions.setImageEmbedded(true);
+        htmlOptions.setStyleDefine(HTMLOptions.StyleDefineType.Inline);
+
         for (int i = 0, len = sheets.size(); i < len; i++) {
             worksheet = sheets.get(i);
             // 生成 html
-            worksheet.saveToHtml(path + worksheet.getName() + File.separator + worksheet.getName() + ".html");
-            // 生成 pdf
-            worksheet.saveToPdf(path + worksheet.getName() + File.separator + worksheet.getName() + ".pdf");
-            // 生成 image
-            worksheet.saveToImage(path + worksheet.getName() + File.separator + worksheet.getName() + ".png");
+            worksheet.saveToHtml(path + worksheet.getName() + File.separator + worksheet.getName() + ".html",
+                    htmlOptions);
         }
 
         //清空临时文件
